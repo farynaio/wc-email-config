@@ -41,7 +41,7 @@ class WC_Email_Config {
     $config_path = apply_filters('appdy_wc_email_config_path', null);
 
     if ($config_path && file_exists($config_path)) {
-      require_once($config_path);
+      require($config_path);
       $mailer->isSMTP();
       $mailer->Host       = $config['smtp_host'];
       $mailer->SMTPAuth   = $config['smtp_auth'];
@@ -59,7 +59,7 @@ class WC_Email_Config {
     }
   }
 
-  function handle_error() {
+  function handle_error($error) {
     error_log('wp_mail failed: ' . $error->get_error_message());
   }
 
