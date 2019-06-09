@@ -7,18 +7,19 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Author: Appdy LTD
  * Author URI: https://github.com/adamfaryna
+ * Text Domain: appdy-email-config
  */
 
 defined( 'ABSPATH' ) or die('No script kiddies please!');
 
 class WC_Email_Config {
 
-  private static $instance;
-
   function __construct() {
     add_action('phpmailer_init', [$this, 'configure_mailer']);
     add_action('phpmailer_init', [$this, 'fix_multipart_issue']);
     add_action('wp_mail_failed', [$this, 'handle_error']);
+
+    load_plugin_textdomain('appdy-email-config', false, basename(dirname(__FILE__)) . '/languages');
   }
 
   function __destruct() {
@@ -27,14 +28,16 @@ class WC_Email_Config {
   }
 
   static function instance() {
-    if (isset($this->$instance)) {
-      $this-$instance = new WC_Email_Config();
+    static $instance = null;
+
+    if ($instance === null) {
+      $instance = new WC_Email_Config();
     }
 
     return $instance;
   }
 
-  function configure_mailer() {
+  function configure_mailer($mailer) {
     $config_path = apply_filters('appdy_wc_email_config_path', null);
 
     if (file_exists($config_path)) {
@@ -48,11 +51,11 @@ class WC_Email_Config {
       $mailer->Password   = $config['smtp_password'];
       $mailer->From       = $config['smtp_from'];
       $mailer->FromName   = $config['smtp_fromname'];
-      $mailer->SMTPDebug  = 2;
+      $mailer->SMTPDebug  = $config['debug_level'];
       $mailer->CharSet    = 'utf-8';
 
     } else {
-      error_log('wc-email-config: no config file found!');
+      trigger_error(__('wc-email-config: no config file found!', 'wc-email-config'), E_USER_ERROR);
     }
   }
 

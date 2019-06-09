@@ -8,7 +8,8 @@ $config = [
   'smtp_username' => '',
   'smtp_password' => '',
   'smtp_from' => '',
-  'smtp_fromname' => ''
+  'smtp_fromname' => '',
+  'debug_level' => 0
 ];
 
 ?>
