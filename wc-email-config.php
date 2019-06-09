@@ -40,7 +40,7 @@ class WC_Email_Config {
   function configure_mailer($mailer) {
     $config_path = apply_filters('appdy_wc_email_config_path', null);
 
-    if (file_exists($config_path)) {
+    if ($config_path && file_exists($config_path)) {
       require_once($config_path);
       $mailer->isSMTP();
       $mailer->Host       = $config['smtp_host'];
