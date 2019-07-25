@@ -1,5 +1,7 @@
 <?php
 
+defined( 'ABSPATH' ) || exit;
+
 $config = [
   'smtp_host' => '',
   'smtp_auth' => true,
