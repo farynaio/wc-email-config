@@ -17,6 +17,7 @@ class WC_Email_Config {
   function __construct() {
     add_action('phpmailer_init', [$this, 'configure_mailer']);
     add_action('phpmailer_init', [$this, 'fix_multipart_issue']);
+    // do_action('phpmailer_init_bounce', [$this, 'configure_mailer_bounce']);
     add_action('wp_mail_failed', [$this, 'handle_error']);
 
     load_plugin_textdomain('appdy-email-config', false, basename(dirname(__FILE__)) . '/languages');
@@ -53,6 +54,30 @@ class WC_Email_Config {
       $mailer->FromName   = $config['smtp_fromname'];
       $mailer->SMTPDebug  = $config['debug_level'];
       $mailer->CharSet    = 'utf-8';
+
+    } else {
+      trigger_error(__('wc-email-config: no config file found!', 'wc-email-config'), E_USER_ERROR);
+    }
+  }
+
+  function configure_mailer_bounce() {
+    $config_path = apply_filters('appdy_wc_email_config_path', null);
+
+    if ($config_path && file_exists($config_path)) {
+      require($config_path);
+      $mailer = new PHPMailer();
+      $mailer->isSMTP();
+      $mailer->Host       = $config_bounce['smtp_host'];
+      $mailer->SMTPAuth   = $config_bounce['smtp_auth'];
+      $mailer->Port       = $config_bounce['smtp_port'];
+      $mailer->SMTPSecure = $config_bounce['smtp_secure'];
+      $mailer->Username   = $config_bounce['smtp_username'];
+      $mailer->Password   = $config_bounce['smtp_password'];
+      $mailer->From       = $config_bounce['smtp_from'];
+      $mailer->FromName   = $config_bounce['smtp_fromname'];
+      $mailer->SMTPDebug  = $config_bounce['debug_level'];
+      $mailer->CharSet    = 'utf-8';
+      $GLOBALS['phpmailer_bounce'] = $mailer;
 
     } else {
       trigger_error(__('wc-email-config: no config file found!', 'wc-email-config'), E_USER_ERROR);
